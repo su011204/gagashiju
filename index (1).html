@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>尕尕老师 · 多平台内容工作台</title>
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+<style>
+:root{
+  --paper:#F4F0E6;
+  --paper-2:#ECE6D8;
+  --ink:#232A26;
+  --deep:#16343A;
+  --deep-2:#0F2529;
+  --ember:#C0521E;
+  --gold:#DE9E4F;
+  --teal:#2C7A76;
+  --muted:#6E6A5E;
+  --line:#D8CFBA;
+  --line-2:#C4B99F;
+  --white:#FBF8F1;
+  --serif:"Noto Serif SC",Georgia,"Songti SC","SimSun",serif;
+  --sans:"Noto Sans SC","PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.num{font-variant-numeric:tabular-nums}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+/* ===== Header ===== */
+header{background:var(--deep);color:var(--white);position:relative;overflow:hidden}
+header .wrap{position:relative;z-index:2;padding-top:34px;padding-bottom:26px}
+.stave{position:absolute;inset:0;opacity:.16;pointer-events:none}
+.stave svg{width:100%;height:100%;display:block}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.22em;color:var(--gold);font-weight:500;text-transform:uppercase}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--ember);display:inline-block}
+h1{font-family:var(--serif);font-weight:900;font-size:30px;margin-top:10px;letter-spacing:.02em}
+h1 em{font-style:normal;color:var(--gold)}
+.sub{color:rgba(251,248,241,.72);font-size:13.5px;margin-top:8px;max-width:640px}
+.head-meta{display:flex;flex-wrap:wrap;gap:16px;margin-top:20px;font-size:12.5px;color:rgba(251,248,241,.6)}
+.head-meta b{color:var(--white);font-weight:500}
+
+/* ===== Platform Tabs ===== */
+.tabs{background:var(--deep-2);position:sticky;top:0;z-index:20}
+.tabs .wrap{display:flex;gap:4px;padding-top:0;padding-bottom:0}
+.tab{flex:1;max-width:260px;background:none;border:none;color:rgba(251,248,241,.66);font-family:var(--sans);font-size:14px;font-weight:500;padding:15px 16px;cursor:pointer;display:flex;align-items:center;gap:9px;border-bottom:3px solid transparent;transition:color .18s,border-color .18s}
+.tab svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.7}
+.tab:hover{color:var(--white)}
+.tab.active{color:var(--white);border-bottom-color:var(--ember);background:rgba(192,82,30,.10)}
+.tab .pill{font-size:10.5px;padding:1px 7px;border-radius:20px;background:rgba(255,255,255,.14);color:var(--white);font-weight:400}
+.tab.active .pill{background:var(--ember)}
+
+/* ===== Sections & views ===== */
+.view{display:none}
+.view.active{display:block;animation:fade .28s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+main{padding:30px 0 20px}
+.section-head{display:flex;align-items:baseline;gap:12px;margin:34px 0 14px}
+.section-head:first-child{margin-top:4px}
+.section-head h2{font-family:var(--serif);font-weight:700;font-size:21px}
+.section-head .rule{flex:1;height:1px;background:var(--line)}
+.section-head .tag{font-size:12px;color:var(--muted);letter-spacing:.06em}
+.kicker{font-size:12px;color:var(--ember);letter-spacing:.18em;font-weight:500;margin-bottom:4px}
+
+/* ===== KPI strip ===== */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.kpi{background:var(--white);border:1px solid var(--line);border-top:3px solid var(--ember);padding:16px 18px;position:relative}
+.kpi.teal{border-top-color:var(--teal)}
+.kpi.gold{border-top-color:var(--gold)}
+.kpi.deep{border-top-color:var(--deep)}
+.kpi .label{font-size:12px;color:var(--muted);letter-spacing:.05em}
+.kpi .value{font-family:var(--serif);font-weight:700;font-size:28px;margin-top:4px;line-height:1.2}
+.kpi .hint{font-size:11.5px;color:var(--muted);margin-top:3px}
+
+/* ===== Panels / grids ===== */
+.grid-2{display:grid;grid-template-columns:1.25fr 1fr;gap:14px}
+.grid-2b{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.panel{background:var(--white);border:1px solid var(--line);padding:18px 20px}
+.panel h3{font-family:var(--serif);font-weight:700;font-size:16px;display:flex;align-items:center;gap:8px}
+.panel h3 .idx{color:var(--ember);font-size:13px;letter-spacing:.1em}
+.panel .note{font-size:12px;color:var(--muted);margin-top:5px}
+
+/* ===== Table ===== */
+.tbl-wrap{overflow-x:auto;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:560px}
+th{text-align:left;font-weight:500;color:var(--muted);font-size:11.5px;letter-spacing:.08em;padding:8px 10px;border-bottom:1px solid var(--line-2);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#FAF6EC}
+td.t{font-weight:500;min-width:200px}
+.tagchip{display:inline-block;font-size:11px;padding:1px 8px;border-radius:20px;border:1px solid var(--line-2);color:var(--muted);white-space:nowrap}
+.tagchip.声乐{color:#8A3B16;background:#F9E8DC;border-color:#E4C3A8}
+.tagchip.生活vlog{color:#1E5E5B;background:#DFF0EC;border-color:#BBDCD6}
+.tagchip.系列运营{color:#8A6A10;background:#F7EBCD;border-color:#E2D3A0}
+.pinned{background:#FBF7EC}
+
+/* ===== Donut ===== */
+.donut-row{display:flex;align-items:center;gap:22px;margin-top:10px;flex-wrap:wrap}
+.donut{position:relative;width:150px;height:150px;flex:none}
+.donut .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.donut .center b{font-family:var(--serif);font-size:24px}
+.donut .center span{font-size:11px;color:var(--muted)}
+.legend{display:flex;flex-direction:column;gap:9px;flex:1;min-width:170px}
+.legend .row{display:flex;align-items:center;gap:9px;font-size:13px}
+.legend .sw{width:11px;height:11px;border-radius:2px;flex:none}
+.legend .pct{margin-left:auto;font-weight:600;font-family:var(--serif)}
+.legend .cnt{color:var(--muted);font-size:12px;margin-left:5px}
+
+/* ===== Bars (benchmark) ===== */
+.bench{display:flex;flex-direction:column;gap:16px;margin-top:14px}
+.bench .row{display:grid;grid-template-columns:110px 1fr 74px;align-items:center;gap:12px;font-size:12.5px}
+.bench .name{color:var(--muted);white-space:nowrap}
+.bench .track{height:22px;background:var(--paper-2);border-radius:2px;position:relative;overflow:hidden}
+.bench .fill{position:absolute;left:0;top:0;bottom:0;background:var(--ember);border-radius:2px}
+.bench .fill.teal{background:var(--teal)}
+.bench .fill.gold{background:var(--gold)}
+.bench .val{text-align:right;font-weight:600;font-family:var(--serif);font-size:14px}
+.bench .base{grid-column:2/4;font-size:11.5px;color:var(--muted);margin-top:-8px}
+
+/* ===== Trend ===== */
+.trend-note{display:flex;align-items:center;gap:10px;border:1px dashed var(--line-2);background:#FAF6EC;padding:14px 16px;font-size:13px;color:var(--muted);margin-top:12px}
+.trend-note svg{width:20px;height:20px;stroke:var(--teal);fill:none;stroke-width:1.6;flex:none}
+.trend-note b{color:var(--ink)}
+
+/* ===== Insight band ===== */
+.insight{background:var(--deep);color:var(--white);padding:28px 30px;margin-top:26px;position:relative;overflow:hidden}
+.insight::after{content:"";position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;border:1px solid rgba(222,158,79,.28);pointer-events:none}
+.insight::before{content:"";position:absolute;right:-20px;top:-20px;width:140px;height:140px;border-radius:50%;border:1px solid rgba(222,158,79,.18);pointer-events:none}
+.insight h3{font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:14px;display:flex;gap:10px;align-items:center}
+.insight h3 .oct{width:22px;height:22px;border-radius:50%;background:var(--ember);display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--white)}
+.insight ul{list-style:none;display:grid;gap:10px}
+.insight li{display:flex;gap:10px;font-size:13.5px;color:rgba(251,248,241,.88)}
+.insight li .b{flex:none;width:5px;height:5px;border-radius:50%;background:var(--gold);margin-top:8px}
+.insight li b{color:var(--gold);font-weight:600}
+.insight .cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:6px}
+@media(max-width:768px){.insight .cols{grid-template-columns:1fr}}
+
+/* ===== Empty states ===== */
+.empty{background:var(--white);border:1px dashed var(--line-2);padding:46px 30px;text-align:center}
+.empty svg{width:44px;height:44px;stroke:var(--line-2);fill:none;stroke-width:1.4;margin-bottom:14px}
+.empty h3{font-family:var(--serif);font-weight:700;font-size:18px;color:var(--ink)}
+.empty p{font-size:13px;color:var(--muted);max-width:520px;margin:8px auto 0}
+.empty .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:22px;text-align:left}
+.empty .step{background:var(--paper);border:1px solid var(--line);padding:14px 16px;font-size:12.5px;color:var(--muted)}
+.empty .step b{display:block;color:var(--ink);font-size:13.5px;margin-bottom:4px}
+.empty .step .n{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;background:var(--deep);color:var(--white);border-radius:50%;font-size:11px;margin-bottom:8px}
+
+/* ===== Footer ===== */
+footer{border-top:1px solid var(--line);margin-top:44px;padding:22px 0 40px;color:var(--muted);font-size:12px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:10px 26px;justify-content:space-between}
+footer b{color:var(--ink);font-weight:500}
+
+/* ===== Password lock ===== */
+#lock{position:fixed;inset:0;z-index:100;background:var(--deep-2);display:flex;align-items:center;justify-content:center;padding:24px}
+#lock .lock-card{background:var(--paper);max-width:380px;width:100%;padding:38px 34px;text-align:center;border-top:4px solid var(--ember);box-shadow:0 30px 80px rgba(0,0,0,.35)}
+#lock .lock-note{width:54px;height:54px;margin:0 auto 16px;border-radius:50%;background:var(--deep);display:flex;align-items:center;justify-content:center}
+#lock .lock-note svg{width:26px;height:26px;stroke:var(--gold);fill:none;stroke-width:1.8}
+#lock h2{font-family:var(--serif);font-weight:700;font-size:19px;color:var(--ink)}
+#lock p{font-size:12.5px;color:var(--muted);margin:6px 0 18px}
+#lock input{width:100%;padding:12px 14px;border:1px solid var(--line-2);background:var(--white);font-size:14px;color:var(--ink);outline:none;font-family:var(--sans)}
+#lock input:focus{border-color:var(--ember)}
+#lock button{width:100%;margin-top:12px;padding:12px;background:var(--ember);border:none;color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--sans);letter-spacing:.12em}
+#lock button:hover{background:#A8441A}
+#lock .err{color:#B03A1E;font-size:12px;margin-top:10px;min-height:16px}
+
+@media(max-width:768px){
+  .grid-2,.grid-2b{grid-template-columns:1fr}
+  h1{font-size:23px}
+  .tabs .wrap{gap:0}
+  .tab{padding:13px 10px;font-size:13px}
+  .tab .pill{display:none}
+  .kpi .value{font-size:24px}
+  body{font-size:14px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ===== Password Lock ===== -->
+<div id="lock" role="dialog" aria-label="访问密码">
+  <div class="lock-card">
+    <div class="lock-note">
+      <svg viewBox="0 0 24 24"><path d="M12 4c2.5 0 4.5 2 4.5 4.5S14.5 13 12 13s-4.5-2-4.5-4.5S9.5 4 12 4z"/><path d="M12 13v3M9.5 20c0-1.5 1-2.5 2.5-2.5s2.5 1 2.5 2.5"/></svg>
+    </div>
+    <h2>尕尕老师 · 多平台内容工作台</h2>
+    <p>团队内部数据看板 · 请输入访问密码</p>
+    <input type="password" id="lock-pass" placeholder="访问密码" autocomplete="off">
+    <button id="lock-btn" type="button">进入工作台</button>
+    <p class="err" id="lock-err"></p>
+  </div>
+</div>
+
+<!-- ===== Header ===== -->
+<header>
+  <div class="stave" aria-hidden="true">
+    <svg viewBox="0 0 1440 220" preserveAspectRatio="xMidYMid slice">
+      <g stroke="#ffffff" stroke-width="1">
+        <line x1="0" y1="40" x2="1440" y2="40"/><line x1="0" y1="48" x2="1440" y2="48"/>
+        <line x1="0" y1="56" x2="1440" y2="56"/><line x1="0" y1="64" x2="1440" y2="64"/>
+        <line x1="0" y1="72" x2="1440" y2="72"/>
+      </g>
+      <g fill="#DE9E4F">
+        <ellipse cx="180" cy="56" rx="9" ry="6" transform="rotate(-8 180 56)"/>
+        <line x1="187" y1="52" x2="187" y2="30" stroke="#DE9E4F" stroke-width="2"/>
+        <ellipse cx="620" cy="72" rx="9" ry="6" transform="rotate(-8 620 72)"/>
+        <line x1="627" y1="68" x2="627" y2="46" stroke="#DE9E4F" stroke-width="2"/>
+        <ellipse cx="1120" cy="48" rx="9" ry="6" transform="rotate(-8 1120 48)"/>
+        <line x1="1127" y1="44" x2="1127" y2="22" stroke="#DE9E4F" stroke-width="2"/>
+      </g>
+    </svg>
+  </div>
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span>民族声乐 · 多平台内容工作台</span>
+    <h1>尕尕老师<em> · </em>账号与赛道分析</h1>
+    <p class="sub">为尕尕老师团队搭建的账号分析与赛道分析工作台，覆盖抖音、小红书、视频号三平台的内容数据与运营洞察。</p>
+    <div class="head-meta">
+      <span>数据快照：<b>2026-10-17</b></span>
+      <span>更新机制：<b>每周一自动同步</b></span>
+      <span>平台：<b>抖音 · 小红书 · 视频号</b> 全部已接入</span>
+    </div>
+  </div>
+</header>
+
+<!-- ===== Tabs ===== -->
+<nav class="tabs">
+  <div class="wrap">
+    <button class="tab active" data-view="dy" aria-selected="true">
+      <svg viewBox="0 0 24 24"><path d="M8.6 3h6.8l-.5 4h4l-.4 3.4h-4.1l-.6 6.2c-.1 1.2.6 2.1 1.9 2.1 1 0 2-.3 3-1l.8 2.8c-1.2.6-2.5 1-3.9 1-2.9 0-4.7-1.7-4.4-4.6l.7-6.5H6.6L7 7h4.3L8.6 3z"/></svg>
+      抖音<span class="pill">已接入</span>
+    </button>
+    <button class="tab" data-view="xhs" aria-selected="false">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 7l1.6 3.6L17.5 12l-3.9 1.4L12 17l-1.6-3.6L6.5 12l3.9-1.4L12 7z"/></svg>
+      小红书<span class="pill">已接入</span>
+    </button>
+    <button class="tab" data-view="ship" aria-selected="false">
+      <svg viewBox="0 0 24 24"><path d="M12 4c2.5 0 4.5 2 4.5 4.5S14.5 13 12 13s-4.5-2-4.5-4.5S9.5 4 12 4z"/><path d="M12 13v3M9.5 20c0-1.5 1-2.5 2.5-2.5s2.5 1 2.5 2.5"/></svg>
+      视频号<span class="pill">已接入</span>
+    </button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- ===================== 抖音视图 ===================== -->
+<section class="view active" id="view-dy">
+
+  <div class="section-head"><div><p class="kicker">DOUYIN · 已接入</p><h2>账号总览</h2></div><span class="rule"></span><span class="tag">数据截至 2026-10-17</span></div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="label">粉丝量</div><div class="value num">1.4万</div><div class="hint">14000 粉丝</div></div>
+    <div class="kpi teal"><div class="label">获赞数</div><div class="value num">8.0万</div><div class="hint">80000 获赞</div></div>
+    <div class="kpi gold"><div class="label">作品总数</div><div class="value num">121</div><div class="hint">持续发布中</div></div>
+    <div class="kpi deep"><div class="label">关注数</div><div class="value num">190</div><div class="hint">低关注 · 高信任</div></div>
+  </div>
+
+  <div class="grid-2" style="margin-top:14px">
+    <div class="panel">
+      <h3><span class="idx">近7天</span>最新作品表现</h3>
+      <p class="note">最近 7 天发布 6 条作品 · 总点赞 303 · 总评论 26 · 总收藏 14 · 总转发 13 · 平均单条点赞 51</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>作品</th><th>类型</th><th>点赞</th><th>评论</th><th>收藏</th><th>转发</th></tr></thead>
+          <tbody>
+            <tr><td class="t">《如愿》致敬新疆医科大学七十华诞</td><td><span class="tagchip 声乐">声乐</span></td><td class="num">30</td><td class="num">4</td><td class="num">1</td><td class="num">0</td></tr>
+            <tr><td class="t">又一年乌鲁木齐的初雪</td><td><span class="tagchip 生活vlog">生活vlog</span></td><td class="num">49</td><td class="num">2</td><td class="num">2</td><td class="num">2</td></tr>
+            <tr><td class="t">和朋友们相约南山聚餐</td><td><span class="tagchip 生活vlog">生活vlog</span></td><td class="num">21</td><td class="num">0</td><td class="num">1</td><td class="num">0</td></tr>
+            <tr><td class="t">夜游昌吉美食街</td><td><span class="tagchip 生活vlog">生活vlog</span></td><td class="num">63</td><td class="num">5</td><td class="num">3</td><td class="num">1</td></tr>
+            <tr><td class="t">用一曲《如愿》温柔打开新疆的冬天·完整版</td><td><span class="tagchip 系列运营">系列运营</span></td><td class="num">60</td><td class="num">7</td><td class="num">5</td><td class="num">8</td></tr>
+            <tr><td class="t">《如愿》女低音翻唱·录音室花絮</td><td><span class="tagchip 系列运营">系列运营</span></td><td class="num">80</td><td class="num">8</td><td class="num">2</td><td class="num">2</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3><span class="idx">样本</span>作品类型分布</h3>
+      <p class="note">样本：最近录入的 9 条作品（含置顶爆款）</p>
+      <div class="donut-row">
+        <div class="donut">
+          <svg viewBox="0 0 150 150" width="150" height="150">
+            <circle cx="75" cy="75" r="60" fill="none" stroke="#ECE6D8" stroke-width="20"/>
+            <circle cx="75" cy="75" r="60" fill="none" stroke="#C0521E" stroke-width="20" stroke-dasharray="167.5 209.4" stroke-dashoffset="0" transform="rotate(-90 75 75)"/>
+            <circle cx="75" cy="75" r="60" fill="none" stroke="#2C7A76" stroke-width="20" stroke-dasharray="125.7 251.2" stroke-dashoffset="-167.5" transform="rotate(-90 75 75)"/>
+            <circle cx="75" cy="75" r="60" fill="none" stroke="#DE9E4F" stroke-width="20" stroke-dasharray="83.8 293.2" stroke-dashoffset="-293.2" transform="rotate(-90 75 75)"/>
+          </svg>
+          <div class="center"><b>9</b><span>作品总数</span></div>
+        </div>
+        <div class="legend">
+          <div class="row"><span class="sw" style="background:#C0521E"></span>声乐<span class="cnt">4 条</span><span class="pct">44%</span></div>
+          <div class="row"><span class="sw" style="background:#2C7A76"></span>生活vlog<span class="cnt">3 条</span><span class="pct">33%</span></div>
+          <div class="row"><span class="sw" style="background:#DE9E4F"></span>系列运营<span class="cnt">2 条</span><span class="pct">22%</span></div>
+        </div>
+      </div>
+      <h3 style="margin-top:22px"><span class="idx">基准</span>近周 vs 置顶爆款</h3>
+      <div class="bench">
+        <div class="row"><span class="name">近7天平均点赞</span><span class="track"><span class="fill teal" style="width:2.4%"></span></span><span class="val num">51</span></div>
+        <div class="row"><span class="name">置顶爆款平均</span><span class="track"><span class="fill" style="width:100%"></span></span><span class="val num">2127</span></div>
+        <div class="base">爆款基准 = 置顶 3 条平均（行云 2944 / 沙枣花 1982 / 百灵鸟 1454）。近周作品与爆款仍有较大量级差距，属正常蓄水期。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-head"><div><p class="kicker">PINNED</p><h2>置顶爆款作品</h2></div><span class="rule"></span><span class="tag">账号最热内容基准</span></div>
+
+  <div class="grid-2b">
+    <div class="panel" style="border-top:3px solid #C0521E">
+      <h3>草原上空的行云疾驰</h3>
+      <p class="note">声乐 · 置顶</p>
+      <div class="kpi" style="margin-top:12px;background:var(--paper);border-color:var(--line)"><div class="label">点赞数</div><div class="value num">2944</div><div class="hint">账号最高点赞作品</div></div>
+    </div>
+    <div class="panel" style="border-top:3px solid #2C7A76">
+      <h3>五月的西北大地，沙枣花</h3>
+      <p class="note">声乐 · 置顶</p>
+      <div class="kpi" style="margin-top:12px;background:var(--paper);border-color:var(--line)"><div class="label">点赞数</div><div class="value num">1982</div><div class="hint">2026-05 发布</div></div>
+    </div>
+    <div class="panel" style="border-top:3px solid #DE9E4F">
+      <h3>伴着新疆经典民歌《百灵鸟》收束悠闲假期</h3>
+      <p class="note">声乐 · 置顶 · 2026-05-31</p>
+      <div class="kpis" style="grid-template-columns:repeat(2,1fr);margin-top:12px">
+        <div class="kpi" style="background:var(--paper);border-color:var(--line)"><div class="label">点赞</div><div class="value num" style="font-size:22px">1454</div></div>
+        <div class="kpi" style="background:var(--paper);border-color:var(--line)"><div class="label">收藏</div><div class="value num" style="font-size:22px">810</div></div>
+        <div class="kpi" style="background:var(--paper);border-color:var(--line)"><div class="label">转发</div><div class="value num" style="font-size:22px">550</div></div>
+        <div class="kpi" style="background:var(--paper);border-color:var(--line)"><div class="label">评论</div><div class="value num" style="font-size:22px">137</div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>粉丝增长趋势</h3>
+      <p class="note">记录日期 · 粉丝量 · 获赞数</p>
+      <div class="trend-note">
+        <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>
+        <span>趋势数据自 <b>2026-10-17</b> 起开始积累（粉丝 14000 · 获赞 80000）。每个周一同步后新增一个数据点，趋势线将随积累逐步成型。</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <h3><span class="oct">✦</span>AI 分析洞察</h3>
+    <div class="cols">
+      <ul>
+        <li><span class="b"></span><span><b>赛道判断：</b>民族声乐 + 新疆民歌属小众蓝海赛道，竞争密度低、用户辨识度高，女低音声线是稀缺差异化标签。</span></li>
+        <li><span class="b"></span><span><b>爆款公式：</b>声乐实力（翻唱经典）× 地域文化（新疆风物）× 情感共鸣（治愈、致敬）——置顶三条均命中此公式。</span></li>
+        <li><span class="b"></span><span><b>内容节奏：</b>近期以《如愿》为主题做「花絮 → 完整版 → 场景版」系列化运营，同一内容多角度复用，利于算法连续加权。</span></li>
+      </ul>
+      <ul>
+        <li><span class="b"></span><span><b>选题建议：</b>围绕新疆四季风物 + 经典民歌改编持续产出；「女低音 + 冷门民歌」组合可形成账号记忆点。</span></li>
+        <li><span class="b"></span><span><b>优化方向：</b>近周 6 条平均点赞 51，与爆款（2000+）量级差距大，建议提升「前 3 秒画面钩子」与话题标签密度。</span></li>
+        <li><span class="b"></span><span><b>运营提醒：</b>生活vlog 类（聚餐/美食街）作为人设补充有效，但核心流量仍靠声乐作品，建议保持声乐占比 60% 以上。</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 小红书视图 ===================== -->
+<section class="view" id="view-xhs">
+  <div class="section-head"><div><p class="kicker">XIAOHONGSHU · 已接入</p><h2>小红书账号分析</h2></div><span class="rule"></span><span class="tag">数据截至 2026-10-17</span></div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="label">粉丝量</div><div class="value num">217</div><div class="hint">增长起步阶段</div></div>
+    <div class="kpi teal"><div class="label">获赞与收藏</div><div class="value num">723</div><div class="hint">收藏占比偏高 · 内容有沉淀价值</div></div>
+    <div class="kpi gold"><div class="label">关注数</div><div class="value num">30</div><div class="hint">小红书号 594697596 · 北京</div></div>
+    <div class="kpi deep"><div class="label">账号年龄</div><div class="value num">31</div><div class="hint">声乐创作者 · 女低音</div></div>
+  </div>
+
+  <div class="grid-2" style="margin-top:14px">
+    <div class="panel">
+      <h3><span class="idx">笔记</span>近期笔记表现</h3>
+      <p class="note">已采集 4 条笔记互动 · 总点赞 45 · 总收藏 9 · 总评论 2</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>笔记</th><th>点赞</th><th>收藏</th><th>评论</th></tr></thead>
+          <tbody>
+            <tr><td class="t">用一曲《如愿》温柔打开新疆浪漫又治愈的冬天</td><td class="num">14</td><td class="num">7</td><td class="num">1</td></tr>
+            <tr><td class="t">又一年乌鲁木齐的初雪</td><td class="num">14</td><td class="num">1</td><td class="num">1</td></tr>
+            <tr><td class="t">以一曲《如愿》致敬新疆医科大学七十华诞</td><td class="num">13</td><td class="num">—</td><td class="num">—</td></tr>
+            <tr><td class="t">夜游昌吉美食街</td><td class="num">4</td><td class="num">1</td><td class="num">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3><span class="idx">观察</span>平台特征与定位</h3>
+      <div class="bench">
+        <div class="row"><span class="name">内容同源率</span><span class="track"><span class="fill teal" style="width:80%"></span></span><span class="val num">80%</span></div>
+        <div class="base">小红书笔记与抖音作品高度同源（《如愿》系列 + 生活vlog），属于「一鱼多吃」的跨平台分发策略。</div>
+      </div>
+      <div class="trend-note" style="margin-top:14px">
+        <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>
+        <span>账号处于<b>粉丝起步期（217 粉）</b>，但获赞与收藏 723 远超粉丝量，说明内容对路人盘有效；收藏占比高，笔记具备长尾搜索价值。</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <h3><span class="oct">✦</span>AI 分析洞察</h3>
+    <div class="cols">
+      <ul>
+        <li><span class="b"></span><span><b>定位：</b>小红书号「尕尕M低音」承接抖音同源内容，声乐+新疆风物人设一致，利于跨平台品牌沉淀。</span></li>
+        <li><span class="b"></span><span><b>优势：</b>《如愿》系列笔记点赞 13-14，收藏表现突出（冬天版藏 7）——治愈系翻唱在小红书有搜索与收藏场景。</span></li>
+        <li><span class="b"></span><span><b>节奏：</b>小红书更新频率低于抖音，建议保持声乐作品双平台同步首发，生活内容可按平台调性差异化。</span></li>
+      </ul>
+      <ul>
+        <li><span class="b"></span><span><b>建议：</b>补充图文笔记（歌词解析 / 民歌背后的故事），小红书图文长尾流量优于纯视频。</span></li>
+        <li><span class="b"></span><span><b>话题：</b>现有标签集中在「女低音尕尕」「如愿翻唱」「新疆」，可增加「民歌科普」「声乐教学」类标签扩大搜索面。</span></li>
+        <li><span class="b"></span><span><b>待补充：</b>笔记总数与完整互动数据将在登录态数据源接入后每周自动同步。</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 视频号视图 ===================== -->
+<section class="view" id="view-ship">
+  <div class="section-head"><div><p class="kicker">WECHAT CHANNELS · 已接入</p><h2>视频号账号分析</h2></div><span class="rule"></span><span class="tag">数据范围 2026-09-18 ~ 10-16 · 26条动态</span></div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="label">近30天作品</div><div class="value num">26</div><div class="hint">持续日更节奏</div></div>
+    <div class="kpi teal"><div class="label">总播放量</div><div class="value num">10.4万</div><div class="hint">单条最高 1.8万+</div></div>
+    <div class="kpi gold"><div class="label">总推荐</div><div class="value num">3289</div><div class="hint">≈ 点赞量</div></div>
+    <div class="kpi deep"><div class="label">总分享</div><div class="value num">2676</div><div class="hint">社交裂变活跃 · 分享率高</div></div>
+  </div>
+
+  <div class="grid-2" style="margin-top:14px">
+    <div class="panel">
+      <h3><span class="idx">TOP5</span>播放量最高作品</h3>
+      <p class="note">视频号播放量是三平台中最高的，文旅 + 声乐双内容引擎均能出量</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>作品</th><th>日期</th><th>播放</th><th>推荐</th><th>分享</th><th>完播率</th></tr></thead>
+          <tbody>
+            <tr><td class="t">打卡新疆首家星巴克非遗旗舰店</td><td class="num">10-02</td><td class="num">18380</td><td class="num">226</td><td class="num">350</td><td class="num">8.8%</td></tr>
+            <tr><td class="t">一直很喜欢《如愿》·女低音翻唱版</td><td class="num">10-11</td><td class="num">9893</td><td class="num">272</td><td class="num">63</td><td class="num">10.9%</td></tr>
+            <tr><td class="t">皓月当空·中秋明月问候</td><td class="num">09-25</td><td class="num">6371</td><td class="num">277</td><td class="num">234</td><td class="num">18.0%</td></tr>
+            <tr><td class="t">走进西安回民街</td><td class="num">09-22</td><td class="num">6220</td><td class="num">208</td><td class="num">135</td><td class="num">9.0%</td></tr>
+            <tr><td class="t">2026新疆丝绸之路葡萄酒节</td><td class="num">09-28</td><td class="num">5723</td><td class="num">176</td><td class="num">125</td><td class="num">3.9%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3><span class="idx">近7天</span>最新动态表现</h3>
+      <p class="note">10-10 ~ 10-16 共 7 条 · 总播放 23615 · 平均单条 3374</p>
+      <div class="bench">
+        <div class="row"><span class="name">《如愿》翻唱版</span><span class="track"><span class="fill" style="width:54%"></span></span><span class="val num">9893</span></div>
+        <div class="row"><span class="name">《如愿》冬天完整版</span><span class="track"><span class="fill" style="width:30%"></span></span><span class="val num">5564</span></div>
+        <div class="row"><span class="name">天润牧场打卡</span><span class="track"><span class="fill teal" style="width:15%"></span></span><span class="val num">2783</span></div>
+        <div class="row"><span class="name">昌吉美食街</span><span class="track"><span class="fill teal" style="width:10%"></span></span><span class="val num">1914</span></div>
+        <div class="row"><span class="name">南山聚餐</span><span class="track"><span class="fill gold" style="width:8%"></span></span><span class="val num">1559</span></div>
+        <div class="row"><span class="name">乌鲁木齐初雪</span><span class="track"><span class="fill gold" style="width:8%"></span></span><span class="val num">1537</span></div>
+        <div class="row"><span class="name">《如愿》医科大版</span><span class="track"><span class="fill" style="width:2%"></span></span><span class="val num">365</span></div>
+        <div class="base">播放量基准 = 近7天最高单条（《如愿》翻唱版 9893）。声乐内容持续稳定出量，医科大场景版刚发布尚在起量。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <h3><span class="oct">✦</span>AI 分析洞察</h3>
+    <div class="cols">
+      <ul>
+        <li><span class="b"></span><span><b>平台定位：</b>视频号是三平台中播放量最大的渠道（近30天 10.4 万播放），微信生态的社交推荐对本地文旅内容有显著加成。</span></li>
+        <li><span class="b"></span><span><b>双内容引擎：</b>「声乐翻唱」（《如愿》系列）+「新疆文旅探店」（星巴克 / 葡萄酒节 / 回民街）双双出量，形成稳定爆款矩阵。</span></li>
+        <li><span class="b"></span><span><b>分享表现：</b>总分享 2676 高于总推荐的一半，文旅 / 节日类内容被主动转发（如初雪分享 123、中秋分享 234），社交裂变价值突出。</span></li>
+      </ul>
+      <ul>
+        <li><span class="b"></span><span><b>优化方向：</b>平均完播率约 8.4% 偏低，建议控制时长在 15 秒内、强化前 3 秒画面钩子，提升完播权重。</span></li>
+        <li><span class="b"></span><span><b>节奏建议：</b>保持日更（26 条 / 月），声乐与文旅交替发布，节日热点（中秋 / 国庆）内容表现明显优于日常。</span></li>
+        <li><span class="b"></span><span><b>待补充：</b>本次 CSV 未含粉丝量字段，如需展示粉丝增长趋势，请在视频号助手后台「数据中心」补充粉丝数据。</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>尕尕老师 · 多平台内容工作台 · 独立数据快照版</span>
+    <span><b>数据来源：</b>云端数据仓库（飞书多维表格）+ 小红书公开主页采集 + 视频号助手后台导出 · 每周一自动同步更新</span>
+    <span>更新于 <b>2026-10-17</b></span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* ===== 密码锁：修改密码只需改下一行的 PASS 值 ===== */
+  var PASS = 'gaga2026';
+  var lock = document.getElementById('lock');
+  if (sessionStorage.getItem('gaga-lock') === '1') {
+    lock.style.display = 'none';
+  } else {
+    document.body.style.overflow = 'hidden';
+    function unlock(){
+      if (document.getElementById('lock-pass').value === PASS) {
+        sessionStorage.setItem('gaga-lock', '1');
+        lock.style.display = 'none';
+        document.body.style.overflow = '';
+      } else {
+        document.getElementById('lock-err').textContent = '密码错误，请重新输入';
+        document.getElementById('lock-pass').value = '';
+        document.getElementById('lock-pass').focus();
+      }
+    }
+    document.getElementById('lock-btn').addEventListener('click', unlock);
+    document.getElementById('lock-pass').addEventListener('keydown', function(e){ if (e.key === 'Enter') unlock(); });
+    document.getElementById('lock-pass').focus();
+  }
+
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var views = { dy: document.getElementById('view-dy'), xhs: document.getElementById('view-xhs'), ship: document.getElementById('view-ship') };
+  function activate(key){
+    tabs.forEach(function(t){ var on = t.getAttribute('data-view') === key; t.classList.toggle('active', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); });
+    Object.keys(views).forEach(function(k){ views[k].classList.toggle('active', k === key); });
+  }
+  tabs.forEach(function(t){ t.addEventListener('click', function(){ activate(t.getAttribute('data-view')); }); });
+})();
+</script>
+</body>
+</html>
